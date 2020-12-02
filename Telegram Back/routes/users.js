@@ -7,58 +7,46 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { forwardAuthenticated } = require("../config/auth");
 
-// Register
-router.post("/register", (req, res) => {
-  console.log(req.body);
-  const { name, email, password, password2 } = req.body;
+// Signup
+router.post("/signup", (req, res) => {
+  const { username, password, password2 } = req.body;
+  const email = req.body.email.toLowerCase();
   let errors = [];
 
-  if (!name || !email || !password || !password2) {
-    errors.push({ msg: "Please enter all fields" });
+  if (!username || !email || !password || !password2) {
+    res.send({ error: "Please, Enter all fields" });
   }
 
   if (password != password2) {
-    errors.push({ msg: "Passwords do not match" });
+    res.send({ error: "Passwords do not match" });
   }
 
   if (password.length < 6) {
-    errors.push({ msg: "Password must be at least 6 characters" });
+    res.send({ error: "Password must be at least 6 characters" });
   }
 
   if (errors.length > 0) {
-    res.render("register", {
-      errors,
-      name,
-      email,
-      password,
-      password2,
-    });
+    res.status(500).send("error");
   } else {
+    console.log(req.body);
     User.findOne({ email: email }).then((user) => {
       if (user) {
-        errors.push({ msg: "Email already exists" });
-        res.render("register", {
-          errors,
-          name,
-          email,
-          password,
-          password2,
-        });
+        res.send({ error: "duplicated user" });
       } else {
+        console.log(req.body);
         const newUser = new User({
-          name,
+          username,
           email,
           password,
         });
-
         bcrypt.genSalt(10, (err, salt) => {
           bcrypt.hash(newUser.password, salt, (err, hash) => {
             if (err) throw err;
             newUser.password = hash;
             newUser
               .save()
-              .then((user) => {
-                res.status(200);
+              .then((newUser) => {
+                res.status(200).send("success");
               })
               .catch((err) => console.log(err));
           });

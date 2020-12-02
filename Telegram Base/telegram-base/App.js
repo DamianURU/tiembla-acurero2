@@ -83,9 +83,10 @@ export default function App() {
         }
         dispatch({ type: "LOGOUT" });
       },
-      signUp: () => {
-        //setUserToken("kasldfsl");
-        //setIsLoading(false);
+      signUp: async (json) => {
+        if (json == "success") {
+          console.log("yes");
+        }
       },
     }),
     []

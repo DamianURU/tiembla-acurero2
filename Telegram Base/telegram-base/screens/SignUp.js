@@ -12,13 +12,19 @@ import picture from "../assets/picture.jpg";
 import { AuthContext } from "../components/context";
 
 export default function SignUp({ navigation }) {
+  const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [password2, setPassword2] = useState("");
   const [image1, setImage1] = useState(false);
-  const isValidUser = useState(true);
-  const isValidPassword = useState(true);
+  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const emailHandler = (enteredText) => {
+    setEmail(enteredText);
+  };
+
+  const usernmaeHandler = (enteredText) => {
     setUsername(enteredText);
   };
 
@@ -26,27 +32,42 @@ export default function SignUp({ navigation }) {
     setPassword(enteredText);
   };
 
+  const password2Handler = (enteredText) => {
+    setPassword2(enteredText);
+  };
+
   const showImageFunc = () => {
     setImage1(!image1);
   };
 
-  const { signIn } = React.useContext(AuthContext);
+  const errorHandler = (error) => {
+    setError(true);
+    setErrorMessage(error);
+    console.log(errorMessage);
+  };
 
-  const loginHandler = async (username, password) => {
+  const { signUp } = React.useContext(AuthContext);
+
+  const signUpHandler = async (email, username, password, password2) => {
     try {
-      let response = await fetch("http://127.0.0.1:5000/users/login", {
+      let response = await fetch("http://127.0.0.1:5000/users/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
         body: JSON.stringify({
-          email: username,
+          email: email,
+          username: username,
           password: password,
+          password2: password2,
         }),
       });
       let json = await response.json();
-      return signIn(json);
+      if (json.error != null) {
+        errorHandler(json.error);
+      }
+      return signUp(json);
     } catch (error) {
       console.error(error);
     }
@@ -55,22 +76,23 @@ export default function SignUp({ navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.logo}>HeyAPP</Text>
+
       <View style={styles.inputView}>
         <TextInput
           style={styles.inputText}
-          placeholder="Email..."
+          placeholder="Enter email..."
           placeholderTextColor="#003f5c"
           onChangeText={emailHandler}
-          value={username}
+          value={email}
         />
       </View>
       <View style={styles.inputView}>
         <Image source={picture} resizeMode="center" />
         <TextInput
           style={styles.inputText}
-          placeholder="Email..."
+          placeholder="Pick your Username"
           placeholderTextColor="#003f5c"
-          onChangeText={emailHandler}
+          onChangeText={usernmaeHandler}
           value={username}
         />
       </View>
@@ -78,7 +100,7 @@ export default function SignUp({ navigation }) {
         <TextInput
           secureTextEntry
           style={styles.inputText}
-          placeholder="Password..."
+          placeholder="Create a Password"
           placeholderTextColor="#003f5c"
           onChangeText={passwordHandler}
           value={password}
@@ -86,24 +108,29 @@ export default function SignUp({ navigation }) {
         <TextInput
           secureTextEntry
           style={styles.inputText}
-          placeholder="Password..."
+          placeholder="Re-entre you password"
           placeholderTextColor="#003f5c"
-          onChangeText={passwordHandler}
-          value={password}
+          onChangeText={password2Handler}
+          value={password2}
         />
       </View>
+
+      {error == true ? (
+        <TextInput style={styles.forgot} value={errorMessage} />
+      ) : (
+        <Text></Text>
+      )}
       <TouchableOpacity>
         <Text style={styles.forgot}>Forgot Password?</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.loginBtn}
         onPress={() => {
-          loginHandler(username, password);
+          signUpHandler(email, username, password, password2);
         }}
       >
-        <Text style={styles.loginText}>LOGIN</Text>
+        <Text style={styles.loginText}>Register</Text>
       </TouchableOpacity>
-
       <TouchableOpacity onPress={showImageFunc}>
         <Text style={styles.loginText}>Zweihander</Text>
       </TouchableOpacity>

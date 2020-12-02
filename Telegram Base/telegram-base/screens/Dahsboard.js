@@ -38,7 +38,7 @@ export default function Dashboard() {
         }}
       />
       <Button
-        title="LOG OUT BITCH"
+        title="LOG OUT"
         onPress={() => {
           signOut();
         }}
