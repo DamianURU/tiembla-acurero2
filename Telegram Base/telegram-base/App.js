@@ -5,11 +5,13 @@ import { AppearanceProvider } from "react-native-appearance";
 import { ThemeProvider } from "./themes/ThemeProvider";
 import Dashboard from "./screens/Dahsboard";
 import Login from "./screens/Login";
+import SignUp from "./screens/SignUp";
 import { AuthContext } from "./components/context";
 import { DrawerActions, NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 
@@ -121,6 +123,7 @@ export default function App() {
             ) : (
               <Stack.Navigator>
                 <Stack.Screen name="Login" component={Login} />
+                <Stack.Screen name="SignUp" component={SignUp} />
               </Stack.Navigator>
             )}
           </NavigationContainer>

@@ -13,7 +13,7 @@ import {
 
 import { AuthContext } from "../components/context";
 
-export default function Login() {
+export default function Login({ navigation }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const isValidUser = useState(true);
@@ -82,7 +82,10 @@ export default function Login() {
       >
         <Text style={styles.loginText}>LOGIN</Text>
       </TouchableOpacity>
-      <TouchableOpacity>
+      <TouchableOpacity
+        title="Go create an account you dummy"
+        onPress={() => navigation.navigate("SignUp")}
+      >
         <Text style={styles.loginText}>Signup</Text>
       </TouchableOpacity>
     </View>

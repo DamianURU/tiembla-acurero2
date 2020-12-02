@@ -1,16 +1,173 @@
-import React, { Component } from "react";
-import { ScrollView, Text, TextInput, View, Button } from "react-native";
+import React, { useState } from "react";
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  TouchableOpacity,
+} from "react-native";
+import picture from "../assets/picture.jpg";
 
-export default class Login extends Component {
-  render() {
-    return (
-      <ScrollView style={{ padding: 20 }}>
-        <Text style={{ fontSize: 27 }}>Login</Text>
-        <TextInput placeholder="Username" />
-        <TextInput placeholder="Password" />
-        <View style={{ margin: 7 }} />
-        <Button onPress={this.props.onLoginPress} title="Submit" />
-      </ScrollView>
-    );
-  }
+import { AuthContext } from "../components/context";
+
+export default function SignUp({ navigation }) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [image1, setImage1] = useState(false);
+  const isValidUser = useState(true);
+  const isValidPassword = useState(true);
+
+  const emailHandler = (enteredText) => {
+    setUsername(enteredText);
+  };
+
+  const passwordHandler = (enteredText) => {
+    setPassword(enteredText);
+  };
+
+  const showImageFunc = () => {
+    setImage1(!image1);
+  };
+
+  const { signIn } = React.useContext(AuthContext);
+
+  const loginHandler = async (username, password) => {
+    try {
+      let response = await fetch("http://127.0.0.1:5000/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          email: username,
+          password: password,
+        }),
+      });
+      let json = await response.json();
+      return signIn(json);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.logo}>HeyAPP</Text>
+      <View style={styles.inputView}>
+        <TextInput
+          style={styles.inputText}
+          placeholder="Email..."
+          placeholderTextColor="#003f5c"
+          onChangeText={emailHandler}
+          value={username}
+        />
+      </View>
+      <View style={styles.inputView}>
+        <Image source={picture} resizeMode="center" />
+        <TextInput
+          style={styles.inputText}
+          placeholder="Email..."
+          placeholderTextColor="#003f5c"
+          onChangeText={emailHandler}
+          value={username}
+        />
+      </View>
+      <View style={styles.inputView}>
+        <TextInput
+          secureTextEntry
+          style={styles.inputText}
+          placeholder="Password..."
+          placeholderTextColor="#003f5c"
+          onChangeText={passwordHandler}
+          value={password}
+        />
+        <TextInput
+          secureTextEntry
+          style={styles.inputText}
+          placeholder="Password..."
+          placeholderTextColor="#003f5c"
+          onChangeText={passwordHandler}
+          value={password}
+        />
+      </View>
+      <TouchableOpacity>
+        <Text style={styles.forgot}>Forgot Password?</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.loginBtn}
+        onPress={() => {
+          loginHandler(username, password);
+        }}
+      >
+        <Text style={styles.loginText}>LOGIN</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={showImageFunc}>
+        <Text style={styles.loginText}>Zweihander</Text>
+      </TouchableOpacity>
+      {image1 == false ? (
+        <Text>+3</Text>
+      ) : (
+        <View style={styles.container1}>
+          <Image style={styles.big} source={picture} resizeMode="cover" />
+          <Text>si</Text>
+        </View>
+      )}
+    </View>
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#003f5c",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  logo: {
+    fontWeight: "bold",
+    fontSize: 50,
+    color: "#fb5b5a",
+    marginBottom: 40,
+  },
+  inputView: {
+    width: "80%",
+    backgroundColor: "#465881",
+    borderRadius: 25,
+    height: 50,
+    marginBottom: 20,
+    justifyContent: "center",
+    padding: 20,
+  },
+  inputText: {
+    height: 50,
+    color: "white",
+  },
+  forgot: {
+    color: "white",
+    fontSize: 11,
+  },
+  loginBtn: {
+    width: "80%",
+    backgroundColor: "#fb5b5a",
+    borderRadius: 25,
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 40,
+    marginBottom: 10,
+  },
+  loginText: {
+    color: "white",
+  },
+
+  container1: {
+    paddingTop: 50,
+  },
+  big: {
+    width: 1000,
+    height: 1000,
+  },
+});
