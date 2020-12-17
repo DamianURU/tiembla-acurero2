@@ -122,7 +122,11 @@ export default function App() {
                 <Drawer.Screen name="Dashboard" component={Dashboard} />
               </Drawer.Navigator>
             ) : (
-              <Stack.Navigator>
+              <Stack.Navigator
+                screenOptions={{
+                  headerShown: false,
+                }}
+              >
                 <Stack.Screen name="Login" component={Login} />
                 <Stack.Screen name="SignUp" component={SignUp} />
               </Stack.Navigator>

@@ -1,3 +1,5 @@
+import io from "socket.io-client";
+
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect } from "react";
 import {
@@ -10,59 +12,55 @@ import {
   View,
   TouchableOpacity,
 } from "react-native";
-import Chat from "../components/chat/Chat";
-import socketClient from "socket.io-client";
-const SERVER = "http://127.0.0.1:8080";
+const SERVER = "https://thrust-back.herokuapp.com/";
 
-import { AuthContext } from "../components/context";
+import { Component } from "react";
 
-export default function Dashboard() {
-  const { signOut } = React.useContext(AuthContext);
+export default class Chat extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      chatMessage: "",
+      chatMessages: [],
+    };
+  }
+  componentDidMount() {
+    this.socket = io(SERVER);
+    this.socket.on("chat message", (msg) => {
+      this.setState({ chatMessages: [...this.state.chatMessages, msg] });
+    });
+  }
+  submitChatMessage() {
+    this.socket.emit("chat message", this.state.chatMessage);
+    this.setState({ chatMessage: "" });
+  }
 
-  var socket = socketClient(SERVER, {
-    withCredentials: true,
-    extraHeaders: {
-      "my-custom-header": "abcd",
-    },
-  });
-  socket.on("connection", () => {
-    console.log(`I'm connected with the back-end`);
-  });
+  render() {
+    const chatMessages = this.state.chatMessages.map((chatMessage) => (
+      <Text>AQUI VA EL TEXTO{chatMessage}</Text>
+    ));
 
-  const TESTDB = async () => {
-    try {
-      let response = await fetch("http://127.0.0.1:5000/test");
-      let json = await response.json();
-      console.log(json);
-      return json.message;
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  return (
-    <View style={styles.container}>
+    return (
       <View>
-        <Text>Text goes here</Text>
-        <Chat />
+        {chatMessages}
+        <TextInput
+          style={{ height: 40, borderWidth: 2 }}
+          autoCorrect={false}
+          value={this.state.chatMessage}
+          onSubmitEditing={() => this.submitChatMessage()}
+          onChangeText={(chatMessage) => {
+            this.setState({ chatMessage });
+          }}
+        />
       </View>
-
-      <Button
-        title="LOG OUT"
-        onPress={() => {
-          signOut();
-        }}
-      />
-    </View>
-  );
+    );
+  }
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#003f5c",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: "#red",
   },
   logo: {
     fontWeight: "bold",

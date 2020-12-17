@@ -1,23 +1,19 @@
-import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
 import {
-  Button,
-  FlatList,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
   TouchableOpacity,
+  Image,
 } from "react-native";
+import logo from "../assets/icon.png";
 
 import { AuthContext } from "../components/context";
 
 export default function Login({ navigation }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const isValidUser = useState(true);
-  const isValidPassword = useState(true);
 
   const emailHandler = (enteredText) => {
     setUsername(enteredText);
@@ -31,17 +27,20 @@ export default function Login({ navigation }) {
 
   const loginHandler = async (username, password) => {
     try {
-      let response = await fetch("http://127.0.0.1:5000/users/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          email: username,
-          password: password,
-        }),
-      });
+      let response = await fetch(
+        "https://thrust-back.herokuapp.com/users/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            email: username,
+            password: password,
+          }),
+        }
+      );
       let json = await response.json();
       return signIn(json);
     } catch (error) {
@@ -51,7 +50,9 @@ export default function Login({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.logo}>HeyAPP</Text>
+      <Image style={styles.logo1} source={logo} resizeMode="cover" />
+      <Text style={styles.logo}>Thrust</Text>
+
       <View style={styles.inputView}>
         <TextInput
           style={styles.inputText}
@@ -95,31 +96,33 @@ export default function Login({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#003f5c",
+    backgroundColor: "white",
     alignItems: "center",
     justifyContent: "center",
   },
   logo: {
     fontWeight: "bold",
+    //fontFamily: "Bahnschrift",
     fontSize: 50,
-    color: "#fb5b5a",
+    color: "#2B4570",
     marginBottom: 40,
   },
   inputView: {
     width: "80%",
-    backgroundColor: "#465881",
-    borderRadius: 25,
+    borderBottomColor: "#2B4570",
+    borderBottomWidth: 5,
     height: 50,
     marginBottom: 20,
     justifyContent: "center",
     padding: 20,
   },
   inputText: {
-    height: 50,
-    color: "white",
+    height: 70,
+    fontSize: 20,
+    color: "#003f5c",
   },
   forgot: {
-    color: "white",
+    color: "#003f5c",
     fontSize: 11,
   },
   loginBtn: {
@@ -133,6 +136,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   loginText: {
-    color: "white",
+    color: "#003f5c",
+  },
+  logo1: {
+    width: 200,
+    height: 200,
+    resizeMode: "center",
   },
 });

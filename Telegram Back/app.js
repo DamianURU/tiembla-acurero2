@@ -3,11 +3,19 @@ const cors = require("cors");
 const expressLayouts = require("express-ejs-layouts");
 const mongoose = require("mongoose");
 const passport = require("passport");
-const flash = require("connect-flash");
 const bodyParser = require("body-parser");
 const session = require("express-session");
-
 const app = express();
+var http = require("http").createServer(app);
+const chatPort = 8080;
+var io = require("socket.io")(http, {
+  cors: {
+    origin: "http://localhost:19006",
+    methods: ["GET", "POST"],
+    allowedHeaders: ["my-custom-header"],
+    credentials: true,
+  },
+});
 
 app.use(cors());
 app.use(express.json());
@@ -50,9 +58,6 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Connect flash
-app.use(flash());
-
 // Global variables
 app.use(function (req, res, next) {
   res.locals.success_msg = req.flash("success_msg");
@@ -74,6 +79,21 @@ app.get("/test", (req, res) =>
   })
 );
 
-const PORT = process.env.PORT || 5000;
+const STATIC_CHANNELS = ["global_notifications", "global_chat"];
+http.listen(chatPort, () => {
+  console.log(`listening on *:${chatPort}`);
+});
+
+io.on("connection", (socket) => {
+  /* socket object may be used to send specific messages to the new connected client */
+
+  console.log("new client connected");
+  socket.on("chat message", (msg) => {
+    console.log(msg);
+    io.emit("chat message", msg);
+  });
+});
+
+const PORT = process.envPORT || 5000;
 
 app.listen(PORT, console.log(`Server started on port ${PORT}`));
